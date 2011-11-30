@@ -1,0 +1,7 @@
+require 'draughts/board'
+require 'draughts/board_survey'
+require 'draughts/checker'
+require 'draughts/game'
+require 'draughts/gui'
+require 'draughts/move_check'
+require 'draughts/user_input'
