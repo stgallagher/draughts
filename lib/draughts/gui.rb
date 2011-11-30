@@ -1,11 +1,11 @@
 class Gui
   
   def intro
-    'Welcome to Checkers!'
+    puts 'Welcome to Checkers!'
   end
   
-  def move_request
-    "#{@current_player.to_s.upcase} make move(x1, y1, x2, y2): "
+  def move_request(current_player)
+    print "#{current_player.to_s.upcase} make move(x1, y1, x2, y2): "
   end 
   
   def render_board(board)
@@ -45,6 +45,6 @@ class Gui
   
   def display_game_ending_message
     winner = (red_checkers_left == 0) ? :black : :red
-    "\n\nCongratulations, #{winner}, You have won!!!"
+    puts "\n\nCongratulations, #{winner}, You have won!!!"
   end
 end

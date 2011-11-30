@@ -1,5 +1,7 @@
 class Board
 
+  attr_accessor :board
+
   def create_board
     @board = Array.new(8)
     8.times { |index| @board[index] = Array.new(8) }
@@ -13,25 +15,7 @@ class Board
     @board
   end
 
-  def create_debug_board_and_play
-    create_test_board
-    red_checker1 = Checker.new(2, 4, :red)
-    red_checker2 = Checker.new(3, 3, :red)
-    red_checker3 = Checker.new(1, 1, :red)
-    black_checker = Checker.new(5, 3, :black)
-    place_checker_on_board(red_checker1)
-    place_checker_on_board(red_checker2)
-    place_checker_on_board(red_checker3)
-    place_checker_on_board(black_checker)
-    play_game
-  end
-
   def place_checker_on_board(checker)
-    if checker.color == :red
-      @red_checkers << checker
-    else
-      @black_checkers << checker
-    end
     @board[checker.x_pos][checker.y_pos] = checker 
   end
 
@@ -44,13 +28,11 @@ class Board
         evens.each do |y_coord|
           red_checker = Checker.new(x_coord, y_coord, :red)
           @board[x_coord][y_coord] = red_checker 
-          @red_checkers << red_checker
         end
       elsif x_coord.odd?
         odds.each do |y_coord|
           red_checker = Checker.new(x_coord, y_coord, :red)
           @board[x_coord][y_coord] = red_checker 
-          @red_checkers << red_checker
         end
       end
     end
@@ -60,13 +42,11 @@ class Board
         evens.each do |y_coord|
           black_checker = Checker.new(x_coord, y_coord, :black)
           @board[x_coord][y_coord] = black_checker 
-          @black_checkers << black_checker
       end
       elsif x_coord.odd?
         odds.each do |y_coord|
           black_checker = Checker.new(x_coord, y_coord, :black)
           @board[x_coord][y_coord] = black_checker 
-          @black_checkers << black_checker
         end
       end
     end
@@ -98,8 +78,8 @@ class Board
     black_count
   end
 
-  def king_checkers_if_necessary
-    @board.each do |row|
+  def self.king_checkers_if_necessary(board)
+    board.each do |row|
       row.each do |loc|
         if (loc != nil) and (loc.color == :red) and (loc.x_pos == 7)
           loc.make_king
@@ -110,16 +90,11 @@ class Board
     end
   end
 
-  def remove_jumped_checker
-    x_delta = (@x_dest > @x_orig) ? 1 : -1
-    y_delta = (@y_dest > @y_orig) ? 1 : -1
+  def self.remove_jumped_checker(board, x_origin, y_origin, x_destination, y_destination)
+    x_delta = (x_destination > x_origin) ? 1 : -1
+    y_delta = (y_destination > y_origin) ? 1 : -1
     
-    remove_checker_x_value = @x_orig + x_delta
-    remove_checker_y_value = @y_orig + y_delta
-    
-    
-    removed_checker = @board[remove_checker_x_value][remove_checker_y_value]
-    @board[remove_checker_x_value][remove_checker_y_value] = nil
+    board[x_origin + x_delta][y_origin + y_delta] = nil
   end
 
 end

@@ -1,29 +1,31 @@
 class BoardSurvey
 
+  attr_accessor :board
+
   def adjacent_positions
     
     if @current_player == :red
       if @x_scan < 7 
-        jump_positions = { "upper_left"  => board[@x_scan + 1][@y_scan + 1],
-                           "upper_right" => board[@x_scan + 1][@y_scan - 1],
-                           "lower_left"  => board[@x_scan - 1][@y_scan + 1],
-                           "lower_right" => board[@x_scan - 1][@y_scan - 1] }
+        jump_positions = { "upper_left"  => @board[@x_scan + 1][@y_scan + 1],
+                           "upper_right" => @board[@x_scan + 1][@y_scan - 1],
+                           "lower_left"  => @board[@x_scan - 1][@y_scan + 1],
+                           "lower_right" => @board[@x_scan - 1][@y_scan - 1] }
       else
         jump_positions = { "upper_left"  => nil,
                            "upper_right" => nil,
-                           "lower_left"  => board[@x_scan - 1][@y_scan + 1],
-                           "lower_right" => board[@x_scan - 1][@y_scan - 1] }
+                           "lower_left"  => @board[@x_scan - 1][@y_scan + 1],
+                           "lower_right" => @board[@x_scan - 1][@y_scan - 1] }
       end
     end
     if @current_player == :black
       if @x_scan < 7
-        jump_positions = { "upper_left"  => board[@x_scan - 1][@y_scan - 1],
-                           "upper_right" => board[@x_scan - 1][@y_scan + 1], 
-                           "lower_left"  => board[@x_scan + 1][@y_scan - 1],
-                           "lower_right" => board[@x_scan + 1][@y_scan + 1] }
+        jump_positions = { "upper_left"  => @board[@x_scan - 1][@y_scan - 1],
+                           "upper_right" => @board[@x_scan - 1][@y_scan + 1], 
+                           "lower_left"  => @board[@x_scan + 1][@y_scan - 1],
+                           "lower_right" => @board[@x_scan + 1][@y_scan + 1] }
       else
-        jump_positions = { "upper_left"  => board[@x_scan - 1][@y_scan - 1],
-                           "upper_right" => board[@x_scan - 1][@y_scan + 1], 
+        jump_positions = { "upper_left"  => @board[@x_scan - 1][@y_scan - 1],
+                           "upper_right" => @board[@x_scan - 1][@y_scan + 1], 
                            "lower_left"  => nil,
                            "lower_right" => nil }
       end  
@@ -56,7 +58,8 @@ class BoardSurvey
   
   def jump_locations 
     opposing_checkers = opposing_checker_adjacent
-     
+    move_check = MoveCheck.new
+
     jump_locations = { "upper_left"  => false,
                        "upper_right" => false,
                        "lower_left"  => false,
@@ -65,15 +68,15 @@ class BoardSurvey
     checker = @board[@x_scan][@y_scan]
     
     if(opposing_checkers["upper_left"] == true) and 
-      (out_of_bounds?(@x_scan + 2, @y_scan + 2) == false) and
-      (board[@x_scan + 2][@y_scan + 2] == nil)
+      (move_check.out_of_bounds?(@x_scan + 2, @y_scan + 2) == false) and
+      (@board[@x_scan + 2][@y_scan + 2] == nil)
 
       jump_locations["upper_left"] = true
     end
     
     if(opposing_checkers["upper_right"] == true) and 
-      (out_of_bounds?(@x_scan + 2, @y_scan - 2) == false) and
-      (board[@x_scan + 2][@y_scan - 2] == nil)
+      (move_check.out_of_bounds?(@x_scan + 2, @y_scan - 2) == false) and
+      (@board[@x_scan + 2][@y_scan - 2] == nil)
 
       jump_locations["upper_right"] = true
     end
@@ -81,15 +84,15 @@ class BoardSurvey
     if(checker.isKing? == true)
       
       if(opposing_checkers["lower_left"] == true) and 
-        (out_of_bounds?(@x_scan - 2, @y_scan + 2) == false) and
-        (board[@x_scan - 2][@y_scan + 2] == nil)
+        (move_check.out_of_bounds?(@x_scan - 2, @y_scan + 2) == false) and
+        (@board[@x_scan - 2][@y_scan + 2] == nil)
 
         jump_locations["lower_left"] = true
       end
 
       if(opposing_checkers["lower_right"] == true) and 
-        (out_of_bounds?(@x_scan - 2, @y_scan - 2) == false) and
-        (board[@x_scan - 2][@y_scan - 2] == nil)
+        (move_check.out_of_bounds?(@x_scan - 2, @y_scan - 2) == false) and
+        (@board[@x_scan - 2][@y_scan - 2] == nil)
   
         jump_locations["lower_right"] = true
       end
@@ -103,15 +106,15 @@ class BoardSurvey
                          "lower_right" => false }
 
       if(opposing_checkers["upper_left"] == true) and 
-        (out_of_bounds?(@x_scan - 2, @y_scan - 2) == false) and
-        (board[@x_scan - 2][@y_scan - 2] == nil)
+        (move_check.out_of_bounds?(@x_scan - 2, @y_scan - 2) == false) and
+        (@board[@x_scan - 2][@y_scan - 2] == nil)
 
         jump_locations["upper_left"] = true
       end
     
       if(opposing_checkers["upper_right"] == true) and 
-        (out_of_bounds?(@x_scan - 2, @y_scan + 2) == false) and
-        (board[@x_scan - 2][@y_scan + 2] == nil)
+        (move_check.out_of_bounds?(@x_scan - 2, @y_scan + 2) == false) and
+        (@board[@x_scan - 2][@y_scan + 2] == nil)
         
         jump_locations["upper_right"] = true
       end
@@ -119,15 +122,15 @@ class BoardSurvey
       if(checker.isKing? == true)
           
         if(opposing_checkers["lower_left"] == true) and 
-          (out_of_bounds?(@x_scan + 2, @y_scan - 2) == false) and
-          (board[@x_scan + 2][@y_scan - 2] == nil)
+          (move_check.out_of_bounds?(@x_scan + 2, @y_scan - 2) == false) and
+          (@board[@x_scan + 2][@y_scan - 2] == nil)
 
           jump_locations["lower_left"] = true
         end
 
         if(opposing_checkers["lower_right"] == true) and 
-          (out_of_bounds?(@x_scan + 2, @y_scan + 2) == false) and
-          (board[@x_scan + 2][@y_scan + 2] == nil)
+          (move_check.out_of_bounds?(@x_scan + 2, @y_scan + 2) == false) and
+          (@board[@x_scan + 2][@y_scan + 2] == nil)
 
           jump_locations["lower_right"] = true
         end
@@ -175,9 +178,11 @@ class BoardSurvey
     jump_coords
   end
   
-  def generate_jump_locations_coordinates_list
+  def generate_jump_locations_coordinates_list(board, current_player)
     coordinates_list = []
-
+    @board = board
+    @current_player = current_player 
+    
     @board.each do |row|
       row.each do |loc|
         if (loc != nil) and (loc.color == @current_player)
@@ -190,6 +195,4 @@ class BoardSurvey
     
     coordinates_list.flatten
   end
- 
-
 end
