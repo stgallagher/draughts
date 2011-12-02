@@ -1,6 +1,45 @@
 class BoardSurvey
 
-  attr_accessor :board
+  attr_accessor :board, :current_player
+  
+  QUADRANTS = ["upper_left", "upper_right", "lower_left", "lower_right"]
+  
+  def invert_array(array)
+    array.map! { |x| -x }
+  end
+  
+  def normal_deltas
+    deltas = [1, 1, 1, -1, -1, 1, -1, -1] 
+    @current_player == :red ? deltas : invert_array(deltas) 
+  end
+  
+  def edge?(x)
+    x > 7
+  end
+
+  def edge_adjust(hash)
+    @current_player == :red ? hash.merge({"upper_left" => nil, "upper_right" => nil}) : hash.merge({"lower_left" => nil, "lower_right" => nil}) 
+  end
+
+  def deltas_to_board_locations(deltas, x, y)
+    board_coords = []
+    deltas.each_slice(2) do |slice|
+      board_coords << x + slice[0] 
+      board_coords << y + slice[1]
+    end
+    board_coords
+  end    
+
+  def assign_adjacent_positions(x, y) 
+      jump_positions = {} 
+      QUADRANTS.each do |quad|
+        deltas_to_board_locations(normal_deltas, x, y).each_slice(2) do |coord|
+          jump_positions[quad] = @board[coord[0]][coord[1]]
+        end
+      end  
+      edge_adjust(jump_positions) if edge?(x)
+      jump_positions
+  end
 
   def adjacent_positions
     
