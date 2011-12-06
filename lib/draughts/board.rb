@@ -14,6 +14,10 @@ class Board
     8.times { |index| @board[index] = Array.new(8) }
     @board
   end
+  
+  def add_checker(board, color, x, y)
+    board[x][y] = Checker.new(x, y, color)
+  end
 
   def place_checker_on_board(checker)
     @board[checker.x_pos][checker.y_pos] = checker 
@@ -96,5 +100,8 @@ class Board
     
     board[x_origin + x_delta][y_origin + y_delta] = nil
   end
-
+  
+  def remove_checker(board, x, y)
+    board[x][y] = nil
+  end
 end

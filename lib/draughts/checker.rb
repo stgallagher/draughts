@@ -8,7 +8,7 @@ class Checker
     @king_status = false
   end
 
-  def isKing?
+  def is_king?
     return @king_status
   end
 
