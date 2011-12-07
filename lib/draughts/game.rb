@@ -5,9 +5,9 @@ class Game
   def initialize
     @gui = Gui.new
     @current_player = :red
-    @board = Board.new.create_board
     @input = UserInput.new
     @move_check = MoveCheck.new
+    @board = Board.new
   end
 
   def play_game
@@ -42,8 +42,8 @@ class Game
     board[x_destination][y_destination] = moving_checker
   end
   
-  def game_over?
-   false
+  def game_over?(board)
+    @board.checkers_left(board, :black) == 0 or @board.checkers_left(board, :red) == 0
   end
 
   def switch_player

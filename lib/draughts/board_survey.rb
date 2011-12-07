@@ -111,10 +111,10 @@ class BoardSurvey
   end
   
   def jump_location_finder_stack(board, x, y)
-    jump_locations = {}
-    opposing_checkers = opposing_checker_adjacent(determine_adjacent_positions_content(board, assign_adjacent_board_coords(x, y)))
-    jump_locations = jump_locations(board, x, y, opposing_checkers)
-    jump_locations
+    adj_board_coords = assign_adjacent_board_coords(x, y)
+    adj_content = determine_adjacent_positions_content(board, adj_board_coords)
+    opposing_checkers = opposing_checker_adjacent(adj_content)
+    jump_locations(board, x, y, opposing_checkers)
   end
 
   def generate_jump_locations_list(board, current_player)

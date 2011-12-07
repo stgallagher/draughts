@@ -1,87 +1,66 @@
 class Board
-
-  attr_accessor :board
-
+  
   def create_board
-    @board = Array.new(8)
-    8.times { |index| @board[index] = Array.new(8) }
-    populate_checkers
-    @board
+    board = Array.new(8)
+    8.times { |index| board[index] = Array.new(8) }
+    populate_checkers(board)
+    board
   end
   
   def create_test_board
-    @board = Array.new(8)
-    8.times { |index| @board[index] = Array.new(8) }
-    @board
+    board = Array.new(8)
+    8.times { |index| board[index] = Array.new(8) }
+    board
   end
   
   def add_checker(board, color, x, y)
     board[x][y] = Checker.new(x, y, color)
   end
 
-  def place_checker_on_board(checker)
-    @board[checker.x_pos][checker.y_pos] = checker 
+  def place_checker_on_board(board, checker)
+    board[checker.x_pos][checker.y_pos] = checker 
   end
 
-  def populate_checkers
-    evens = [0, 2, 4, 6]
-    odds  = [1, 3, 5, 7]
-
+  def populate_checkers(board)
     0.upto(2) do |x_coord|
-      if x_coord.even?
-        evens.each do |y_coord|
-          red_checker = Checker.new(x_coord, y_coord, :red)
-          @board[x_coord][y_coord] = red_checker 
-        end
-      elsif x_coord.odd?
-        odds.each do |y_coord|
-          red_checker = Checker.new(x_coord, y_coord, :red)
-          @board[x_coord][y_coord] = red_checker 
-        end
-      end
+      populate_checker(board, x_coord, :red)
     end
 
     5.upto(7) do |x_coord|
-      if x_coord.even?
-        evens.each do |y_coord|
-          black_checker = Checker.new(x_coord, y_coord, :black)
-          @board[x_coord][y_coord] = black_checker 
-      end
-      elsif x_coord.odd?
-        odds.each do |y_coord|
-          black_checker = Checker.new(x_coord, y_coord, :black)
-          @board[x_coord][y_coord] = black_checker 
-        end
-      end
+      populate_checker(board, x_coord, :black)
     end
+    board
   end
 
-  def red_checkers_left
-    red_count = 0
+  def populate_checker(board, x_coord, color)
+    evens = [0, 2, 4, 6]
+    odds  = [1, 3, 5, 7]
 
-    @board.each do |row|
+    apply_checker = lambda do |y_coord|
+      checker = Checker.new(x_coord, y_coord, color)
+      board[x_coord][y_coord] = checker
+    end
+
+    if x_coord.even?
+      evens.each(&apply_checker)
+    elsif x_coord.odd?
+      odds.each(&apply_checker)
+    end
+  end  
+  
+  def checkers_left(board, color)
+    checker_count = 0
+
+    board.each do |row|
       row.each do |location|
-        if (location.nil? == false) and (location.color == :red)
-          red_count += 1
+        if (location.nil? == false) and (location.color == color)
+          checker_count += 1
         end
       end
     end
-    red_count
+    checker_count
   end
   
-  def black_checkers_left
-    black_count = 0
-
-    @board.each do |row|
-      row.each do |location|
-        if (location.nil? == false) and (location.color == :black)
-          black_count += 1
-        end
-      end
-    end
-    black_count
-  end
-
   def self.king_checkers_if_necessary(board)
     board.each do |row|
       row.each do |loc|

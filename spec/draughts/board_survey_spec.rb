@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe'BoardSurvey' do
+  describe'BoardSurvey' do
   before(:each) do
     @bs = BoardSurvey.new
     @bs.current_player = :red
@@ -65,11 +65,10 @@ describe'BoardSurvey' do
     x_coord = 0
     y_coord = 4
     adjacent_content = @bs.determine_adjacent_positions_content(game_board, @bs.assign_adjacent_board_coords(x_coord, y_coord))
-    opposing_checkers = @bs.opposing_checker_adjacent(adjacent_content)
-    opposing_checkers["upper_left"].should == true 
-    opposing_checkers["upper_right"].should == false
-    opposing_checkers["lower_left"].should == false
-    opposing_checkers["lower_right"].should == false
+    opposing_checkers = @bs.opposing_checker_adjacent(adjacent_content).should include( "upper_left"  => true,
+                                                                                        "upper_right" => false,
+                                                                                        "lower_left"  => false,
+                                                                                        "lower_right" => false)
   end
   
   it "should tell if a prospective position is not out-of-bounds" do
@@ -95,18 +94,12 @@ describe'BoardSurvey' do
     board = Board.new
     game_board = board.create_test_board
     board.add_checker(game_board, :red, 3, 3)
-    x_coord = 3
-    y_coord = 3
-    jump_locations = {}
-    jump_locations["upper_left"]  = true 
-    jump_locations["upper_right"] = false 
-    jump_locations["lower_left"]  = false
-    jump_locations["lower_right"] = true
-    adjusted_jump_locations = @bs.adjust_jump_locations_if_not_king(game_board, x_coord, y_coord, jump_locations)
-    adjusted_jump_locations["upper_left"].should == true 
-    adjusted_jump_locations["upper_right"].should == false 
-    adjusted_jump_locations["lower_left"].should == false
-    adjusted_jump_locations["lower_right"].should == false
+    board.add_checker(game_board, :black, 4, 4)
+    opposing_checkers = @bs.jump_location_finder_stack(game_board, 3, 3)
+    @bs.adjust_jump_locations_if_not_king(game_board, 3, 3, @bs.jump_locations(game_board, 3, 3, opposing_checkers)).should include( "upper_left"  => true,
+                                                                                                                                    "upper_right" => false,
+                                                                                                                                    "lower_left"  => false,
+                                                                                                                                    "lower_right" => false)  
   end 
 
   it "should determine what quadrants meet the conditions for performing a jump" do
@@ -114,14 +107,11 @@ describe'BoardSurvey' do
     game_board = board.create_test_board
     board.add_checker(game_board, :black, 1, 5)
     board.add_checker(game_board, :red, 0, 4)
-    x_coord = 0
-    y_coord = 4
-    opposing_checkers = @bs.opposing_checker_adjacent(@bs.determine_adjacent_positions_content(game_board, @bs.assign_adjacent_board_coords(x_coord, y_coord)))
-    jump_locations = @bs.jump_locations(game_board, x_coord, y_coord, opposing_checkers)
-    jump_locations["upper_left"].should == true 
-    jump_locations["upper_right"].should == false 
-    jump_locations["lower_left"].should == false
-    jump_locations["lower_right"].should == false   
+    opposing_checkers = @bs.jump_location_finder_stack(game_board, 0, 4)    
+    @bs.jump_locations(game_board, 0, 4, opposing_checkers).should include( "upper_left"  => true,
+                                                                                        "upper_right" => false,
+                                                                                        "lower_left"  => false,
+                                                                                        "lower_right" => false)   
   end
 
   it "should give a list of jump landing coordinates for a given position" do
@@ -129,12 +119,9 @@ describe'BoardSurvey' do
     game_board = board.create_test_board
     board.add_checker(game_board, :red, 0, 4)
     board.add_checker(game_board, :black, 1, 5)
-    #board.add_checker(game_board, :black, 4, 2)
-    x_coord = 0
-    y_coord = 4
-    opposing_checkers = @bs.opposing_checker_adjacent(@bs.determine_adjacent_positions_content(game_board, @bs.assign_adjacent_board_coords(x_coord, y_coord)))
-    jump_locations = @bs.jump_locations(game_board, x_coord, y_coord, opposing_checkers)
-    @bs.coordinates_of_jump_landings(x_coord, y_coord, jump_locations).should == [[2, 6]]#[[5,5], [5,1]]  
+    opposing_checkers = @bs.jump_location_finder_stack(game_board, 0, 4)
+    jump_locations = @bs.jump_locations(game_board, 0, 4, opposing_checkers)
+    @bs.coordinates_of_jump_landings(0, 4, jump_locations).should == [[2, 6]]
   end
 
   it "should give a list of jump landing coordinates for every checker on the board of a given color" do
@@ -146,5 +133,17 @@ describe'BoardSurvey' do
     board.add_checker(game_board, :black, 4, 2)
     board.add_checker(game_board, :black, 1, 5)
     @bs.generate_jump_locations_list(game_board, :red).should == [2, 6, 5, 5, 5, 1] 
+  end
+
+  it "should have a method that performs the ladder of methods necessary to determine jump_locations" do
+    board = Board.new
+    game_board = board.create_test_board
+    board.add_checker(game_board, :red, 3, 3)
+    board.add_checker(game_board, :black, 4, 4)
+    board.add_checker(game_board, :black, 4, 2)
+    @bs.jump_location_finder_stack(game_board, 3, 3).should include( "upper_left"  => true,
+                                                                     "upper_right" => true,
+                                                                     "lower_left"  => false,
+                                                                     "lower_right" => false)
   end
 end
