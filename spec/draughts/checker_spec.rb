@@ -15,11 +15,11 @@ describe Checker do
   end
 
   it "should indicate if it is a king or not" do
-    @sample_checker.isKing?.should == false
+    @sample_checker.is_king?.should == false
   end
 
   it"should be capable of becoming a king" do
     @sample_checker.make_king
-    @sample_checker.isKing?.should == true
+    @sample_checker.is_king?.should == true
   end
 end

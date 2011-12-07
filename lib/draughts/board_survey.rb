@@ -52,26 +52,26 @@ class BoardSurvey
     opposing_checker_adjacent
   end
   
-  def not_outside_bounds?(x, y, dx, dy)
+  def not_outside_bounds?(x, y)
     move_check = MoveCheck.new
-    not move_check.out_of_bounds?(x + dx, y + dy)
+    not move_check.out_of_bounds?(x, y)
   end
 
-  def jump_possible?(board, x, y, deltas)
-    (not_outside_bounds?(x, y, deltas[0], deltas[1]) and board[x + deltas[0]][y + deltas[1]] == nil) ? true : false
+  def jump_possible?(board, deltas)
+    (not_outside_bounds?(deltas[0], deltas[1]) and board[deltas[0]][deltas[1]] == nil) ? true : false
   end
   
-  def delta_translator(quad, x, y)
+  def delta_translator(quad, x, y, mag)
     deltas = []
     case quad
     when "upper_left"
-      x += 1; y += 1
+      x += mag; y += mag
     when "upper_right"
-      x += 1; y -= 1
+      x += mag; y -= mag
     when "lower_left"
-      x -= 1; y += 1
+      x -= mag; y += mag
     when "lower_right"
-      x -= 1; y -= 1  
+      x -= mag; y -= mag  
     end
     deltas << x << y
     @current_player == :black ? deltas.reverse : deltas
@@ -89,8 +89,8 @@ class BoardSurvey
     jump_locations = {}
     opposing_checkers.each_pair do |quad, present|
       if present
-        deltas = delta_translator(quad, x, y)
-        jump_possible?(board, x, y, deltas) ? jump_locations[quad] = true : jump_locations[quad] = false
+        deltas = delta_translator(quad, x, y, 2)
+        jump_possible?(board, deltas) ? jump_locations[quad] = true : jump_locations[quad] = false
       else
         jump_locations[quad] = false
       end
@@ -98,61 +98,37 @@ class BoardSurvey
     adjust_jump_locations_if_not_king(board, x, y, jump_locations)
     jump_locations
   end
- 
-    
-  def jump_locations_coordinates
-    locations = jump_locations
-    
+  
+  def coordinates_of_jump_landings(x, y, jump_locations)
     jump_coords = []
     
-    if @current_player == :red
-      if locations["upper_left"]  == true
-        jump_coords << [@x_scan + 2, @y_scan + 2]
-      end
-      if locations["upper_right"] == true
-        jump_coords << [@x_scan + 2, @y_scan - 2] 
-      end
-      if locations["lower_left"]  == true
-        jump_coords << [@x_scan - 2, @y_scan + 2]
-      end
-      if locations["lower_right"] == true
-        jump_coords << [@x_scan - 2, @y_scan - 2]
+    jump_locations.each_pair do |quad, jump|
+      if jump
+        jump_coords << delta_translator(quad, x, y, 2)
       end
     end
-
-    if @current_player == :black
-      if locations["upper_left"]  == true
-        jump_coords << [@x_scan - 2, @y_scan - 2]
-      end
-      if locations["upper_right"] == true
-        jump_coords << [@x_scan - 2, @y_scan + 2] 
-      end
-      if locations["lower_left"]  == true
-        jump_coords << [@x_scan + 2, @y_scan - 2]
-      end
-      if locations["lower_right"] == true
-        jump_coords << [@x_scan + 2, @y_scan + 2]
-      end
-    end
-    
     jump_coords
   end
   
-  def generate_jump_locations_coordinates_list(board, current_player)
+  def jump_location_finder_stack(board, x, y)
+    jump_locations = {}
+    opposing_checkers = opposing_checker_adjacent(determine_adjacent_positions_content(board, assign_adjacent_board_coords(x, y)))
+    jump_locations = jump_locations(board, x, y, opposing_checkers)
+    jump_locations
+  end
+
+  def generate_jump_locations_list(board, current_player)
     coordinates_list = []
-    @board = board
     @current_player = current_player 
     
-    @board.each do |row|
+    board.each do |row|
       row.each do |loc|
         if (loc != nil) and (loc.color == @current_player)
-          @x_scan = loc.x_pos
-          @y_scan = loc.y_pos
-          coordinates_list << jump_locations_coordinates
+          jump_locations = jump_location_finder_stack(board, loc.x_pos, loc.y_pos)
+          coordinates_list << coordinates_of_jump_landings(loc.x_pos, loc.y_pos, jump_locations)  
         end
       end
     end
-    
     coordinates_list.flatten
   end
 end
