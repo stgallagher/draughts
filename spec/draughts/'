@@ -1,0 +1,15 @@
+require 'spec_helper'
+
+describe MoveCheck do
+
+  before(:each) do
+    @mv = MoveCheck.new
+    @game = Game.new
+    @board = Board.new.create_board
+    @current_player = Game.current_player
+  end
+
+  it "should give an error message for an invalid move" do
+    @mv.move_validator(@game, @board, @current_player, 2, 2, 3, 2).should == "You can only move a checker diagonally"
+  end
+end

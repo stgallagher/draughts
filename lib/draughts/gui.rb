@@ -23,13 +23,13 @@ class Gui
             board_display << " " << "  |  "
           end
         elsif board[x_coord][y_coord].color == :red
-          if (board[x_coord][y_coord].isKing?) == true
+          if (board[x_coord][y_coord].is_king?) == true
             board_display << "RK" << " |  "
           else
             board_display << "R" << "  |  "
           end
         elsif board[x_coord][y_coord].color == :black
-          if (board[x_coord][y_coord].isKing?) == true
+          if (board[x_coord][y_coord].is_king?) == true
             board_display << "BK" << " |  "
           else
             board_display << "B" << "  |  "
@@ -39,8 +39,7 @@ class Gui
       board_display << "\n      -------------------------------------------------\n"
     end
     board_display << "\n"
-    puts board_display.to_s
-    board_display.to_s
+    board_display.join
   end
   
   def display_game_ending_message
