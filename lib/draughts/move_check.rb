@@ -4,13 +4,16 @@ class MoveCheck
 
   def initialize
     @survey = BoardSurvey.new
+    @consecutive_jumps = false
   end
 
   def move_validator(game, board, current_player, x_origin, y_origin, x_destination, y_destination)
-    
     message = nil
 
-    case 
+    case
+    when (@consecutive_jumps and board[x_origin][y_origin] != @consecutive_jumper)
+      message =  "You cannot jump with a different checker"
+    
     when out_of_bounds?(x_destination, y_destination) 
       message = "You cannot move off the board"
       
@@ -43,11 +46,24 @@ class MoveCheck
     
     else
       game.move(board, x_origin, y_origin, x_destination, y_destination)
+      
       if jumping_move?(x_origin, x_destination)
         message = "jumping move"
         Board.remove_jumped_checker(board, x_origin, y_origin, x_destination, y_destination)
+        @consecutive_jumps = false
+        
+        if @survey.any_jumps_left?(board, current_player, x_destination, y_destination)
+          @consecutive_jumps = true
+          @consecutive_jumper = board[x_destination][y_destination]
+        end
       end
       Board.king_checkers_if_necessary(board)
+    end
+
+    if message == nil or (message == "jumping move" and jump_available?(board, current_player) == false)
+       if @consecutive_jumps == false
+        game.switch_player
+       end
     end
     message
   end

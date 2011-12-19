@@ -135,7 +135,91 @@ class BoardSurvey
           coordinates_list << coordinates_of_jump_landings(current_player, loc.x_pos, loc.y_pos, jump_locations)  
         end
       end
+  end
+    coordinates_list.flatten
+  end
+
+  def any_jumps_left?(board, current_player, x, y)
+    jumps = jump_location_finder_stack(board, current_player, x, y)
+    jumps.has_value?(true)
+  end
+
+  def surrounding_locations_for_checker(board, current_player, x, y)
+    deltas = normal_deltas(current_player)
+    possible_moves = deltas_to_board_locations(deltas, x, y)
+    if board[x][y].is_king? == false
+      possible_moves.slice!(4, 4)
+    end
+    possible_moves
+  end
+
+  def remove_out_of_bounds_locations(possible_moves)
+    corrected_possible_moves = []
+    possible_moves.each_slice(2) do |coords|
+      if ((coords[0] <= 7 and coords[0] >= 0) and (coords[1] <= 7 and coords[1] >= 0))
+        corrected_possible_moves << coords[0] << coords[1]
+      end
+    end
+    corrected_possible_moves
+  end
+  
+  def normal_move_locations(possible_moves, board, current_player, x, y)
+    corrected_possible_moves = []
+    possible_moves.each_slice(2) do |coords|
+      if board[coords[0]][coords[1]] == nil
+        corrected_possible_moves << x << y << coords[0] << coords[1]
+      end
+    end
+    corrected_possible_moves
+  end
+
+  def normal_move_location_finder_stack(board, current_player, x, y)
+    locations = surrounding_locations_for_checker(board, current_player, x, y)
+    removed_out_of_bounds_locations = remove_out_of_bounds_locations(locations)
+    normal_move_locations = normal_move_locations(removed_out_of_bounds_locations, board, current_player, x, y)
+  end
+
+  def generate_normal_move_locations_list(board, current_player)
+    move_locations = []
+    
+    board.each do |row|
+      row.each do |loc|
+        if (loc != nil) and (loc.color == current_player)
+          move_locations << normal_move_location_finder_stack(board, current_player, loc.x_pos, loc.y_pos)
+        end
+      end
+    end
+    move_locations.flatten
+  end
+ 
+  def coordinates_of_computer_jump_landings(current_player,x, y, jump_locations)
+    jump_coords = []
+    
+    jump_locations.each_pair do |quad, jump|
+      if jump
+        jump_coords << x << y << delta_translator(current_player, quad, x, y, 2)
+      end
+    end
+    jump_coords
+  end
+
+  def generate_computer_jump_locations_list(board, current_player)
+    coordinates_list = []
+    
+    board.each do |row|
+      row.each do |loc|
+        if (loc != nil) and (loc.color == current_player)
+          jump_locations = jump_location_finder_stack(board, current_player, loc.x_pos, loc.y_pos)
+          coordinates_list << coordinates_of_computer_jump_landings(current_player, loc.x_pos, loc.y_pos, jump_locations)  
+        end
+      end
     end
     coordinates_list.flatten
+  end
+
+  def generate_all_possible_moves(board, current_player)
+    all_moves = generate_normal_move_locations_list(board, current_player)
+    all_moves << generate_computer_jump_locations_list(board, current_player)
+    all_moves.flatten
   end
 end

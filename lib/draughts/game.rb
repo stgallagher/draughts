@@ -23,9 +23,6 @@ class Game
 
       message = @move_check.move_validator(self, @game_board, @current_player, coordinates[0], coordinates[1], coordinates[2], coordinates[3])
       puts message unless (message.nil? or message == "jumping move")
-      if(message == nil or message == "jumping move")
-        @current_player = switch_player unless (message == "jumping move" and @move_check.jump_available?(@game_board, @current_player))
-      end
     end
     @gui.display_game_ending_message  
   end

@@ -102,9 +102,9 @@ describe'BoardSurvey' do
     board.add_checker(game_board, :black, 4, 4)
     opposing_checkers = @bs.jump_location_finder_stack(game_board, @current_player, 3, 3)
     @bs.adjust_jump_locations_if_not_king(game_board, 3, 3, @bs.jump_locations(game_board,@current_player, 3, 3, opposing_checkers)).should include( "upper_left"  => true,
-                                                                                                                                    "upper_right" => false,
-                                                                                                                                    "lower_left"  => false,
-                                                                                                                                    "lower_right" => false)  
+                                                                                                                                                     "upper_right" => false,
+                                                                                                                                                     "lower_left"  => false,
+                                                                                                                                                     "lower_right" => false)  
   end 
 
   it "should determine what quadrants meet the conditions for performing a jump" do
@@ -150,5 +150,81 @@ describe'BoardSurvey' do
                                                                            "upper_right" => true,
                                                                            "lower_left"  => false,
                                                                            "lower_right" => false)
+  end
+
+  it "should have a method that tells if there are any jumps remaining for a particular checker " do
+    board = Board.new
+    game_board = board.create_test_board
+    board.add_checker(game_board, :red, 3, 3)
+    board.add_checker(game_board, :black, 4, 4)
+    @bs.any_jumps_left?(game_board, @current_player, 3, 3).should == true
+    board.remove_checker(game_board, 4, 4)
+    @bs.any_jumps_left?(game_board, @current_player, 3, 3).should == false 
+  end
+
+  it "should have a method that finds the available moves spaces for a particular checker" do
+    board = Board.new
+    game_board = board.create_test_board
+    board.add_checker(game_board, :red, 3, 3)
+    @bs.surrounding_locations_for_checker(game_board, :red, 3, 3).should == [4, 4, 4, 2]      
+  end
+
+  it "should have a method that removes out of bounds potential moves" do
+    board = Board.new
+    game_board = board.create_test_board
+    board.add_checker(game_board, :red, 7, 0)
+    game_board[7][0].make_king
+    possible_moves = @bs.surrounding_locations_for_checker(game_board, :red, 7, 0)
+    @bs.remove_out_of_bounds_locations(possible_moves).should == [6, 1]
+  end
+
+  it "should take out locations that are occupied by checkers" do
+    board = Board.new
+    game_board = board.create_test_board
+    board.add_checker(game_board, :red, 3, 3)
+    board.add_checker(game_board, :black, 4, 4)
+    possible_moves = @bs.remove_out_of_bounds_locations(@bs.surrounding_locations_for_checker(game_board, :red, 3, 3))
+    @bs.normal_move_locations(possible_moves, game_board, :red, 3, 3).should == [3, 3, 4, 2] 
+  end
+
+  it "should generate all normal moves for a given board" do
+    board = Board.new
+    game_board = board.create_test_board
+    board.add_checker(game_board, :red, 2, 0)
+    board.add_checker(game_board, :red, 1, 3)
+    board.add_checker(game_board, :red, 5, 5)
+    game_board[5][5].make_king
+    @bs.generate_normal_move_locations_list(game_board, :red).should == [1, 3, 2, 4, 1, 3, 2, 2,
+                                                                         2, 0, 3, 1, 5, 5, 6, 6, 
+                                                                         5, 5, 6, 4, 5, 5, 4, 6, 
+                                                                         5, 5, 4, 4]
+  end
+
+  it "should generate all jump moves for a given board" do
+    board = Board.new
+    game_board = board.create_test_board
+    board.add_checker(game_board, :red, 3, 3)
+    board.add_checker(game_board, :red, 2, 7)
+    board.add_checker(game_board, :black, 4, 4)
+    board.add_checker(game_board, :black, 4, 2)
+    board.add_checker(game_board, :black, 3, 6)
+    @bs.generate_computer_jump_locations_list(game_board, :red).should == [2, 7, 4, 5, 3, 3, 5, 5,
+                                                                         3, 3, 5, 1]
+
+  end 
+  
+  it "should generate all jump moves for a given board" do
+    board = Board.new
+    game_board = board.create_test_board
+    board.add_checker(game_board, :red, 2, 0)
+    board.add_checker(game_board, :red, 2, 2)
+    board.add_checker(game_board, :red, 2, 4)
+    board.add_checker(game_board, :red, 2, 6)
+    board.add_checker(game_board, :black, 3, 3)
+    board.add_checker(game_board, :black, 3, 5)
+    @bs.generate_all_possible_moves(game_board, :red).should == [2, 0, 3, 1, 2, 2, 3, 1,
+                                                                 2, 6, 3, 7, 2, 2, 4, 4,
+                                                                 2, 4, 4, 6, 2, 4, 4, 2,
+                                                                 2, 6, 4, 4] 
   end
 end

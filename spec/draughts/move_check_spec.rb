@@ -80,4 +80,16 @@ describe MoveCheck do
     @clear_board[3][3].make_king
     @mv.non_king_moving_backwards?(@clear_board, :red, 3, 3, 2).should == false
   end
+
+  it "should not allow a player to jump with a different checker one they have started a jump move with a checker" do
+    @b.add_checker(@clear_board, :red, 2, 0)
+    @b.add_checker(@clear_board, :red, 2, 6)
+    @b.add_checker(@clear_board, :black, 3, 1)
+    @b.add_checker(@clear_board, :black, 5, 3)
+    @b.add_checker(@clear_board, :black, 3, 5)
+    @mv.move_validator(@game, @clear_board, :red, 2, 0, 4, 2).should == "jumping move"
+    @mv.move_validator(@game, @clear_board, :red, 2, 6, 4, 4).should == "You cannot jump with a different checker"
+  end
+
+  
 end
