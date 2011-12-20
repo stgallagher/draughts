@@ -59,10 +59,10 @@ class MoveCheck
       end
       Board.king_checkers_if_necessary(board)
     end
-
+    
     if message == nil or (message == "jumping move" and jump_available?(board, current_player) == false)
        if @consecutive_jumps == false
-        game.switch_player
+       game.current_player = game.switch_player
        end
     end
     message

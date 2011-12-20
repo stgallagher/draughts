@@ -91,5 +91,9 @@ describe MoveCheck do
     @mv.move_validator(@game, @clear_board, :red, 2, 6, 4, 4).should == "You cannot jump with a different checker"
   end
 
-  
+  it "should switch player control when a valid move is made" do
+    @b.add_checker(@clear_board, :red, 2, 0)
+    @mv.move_validator(@game, @clear_board, :red, 2, 0, 3, 1).should == nil
+    @game.current_player.should == :black
+  end 
 end

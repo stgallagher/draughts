@@ -4,6 +4,10 @@ class Gui
     puts 'Welcome to Checkers!'
   end
   
+  def one_or_two_player_prompt
+    print "Do you want to play against the computer? (y or n)"
+  end
+
   def move_request(current_player)
     print "#{current_player.to_s.upcase} make move(x1, y1, x2, y2): "
   end 

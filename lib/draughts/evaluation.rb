@@ -9,7 +9,7 @@ class Evaluation
                    [   4, nil,   3, nil,   3, nil,   3, nil],
                    [ nil,   4, nil,   4, nil,   4, nil,   4], ]
 
-  def evalute_board(board, color)
+  def evaluate_board(board, color)
     player_value = 0
     opponent_value = 0
 
@@ -43,8 +43,7 @@ class Evaluation
     if position.is_king?
       value = 10
     end
-    p value * BOARD_WEIGHT[position.x_pos][position.y_pos]   
+    
     return value * BOARD_WEIGHT[position.x_pos][position.y_pos]
   end
-
 end

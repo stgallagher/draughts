@@ -24,6 +24,6 @@ describe Evaluation do
     @b.add_checker(@clear_board, :black, 1, 5)
     @b.add_checker(@clear_board, :black, 7, 5)
     @clear_board[7][5].make_king
-    @eval.evalute_board(@clear_board, :red).should == -26
+    @eval.evaluate_board(@clear_board, :red).should == -26
   end
 end

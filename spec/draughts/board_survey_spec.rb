@@ -213,7 +213,7 @@ describe'BoardSurvey' do
 
   end 
   
-  it "should generate all jump moves for a given board" do
+  it "should generate all possible moves for a given board" do
     board = Board.new
     game_board = board.create_test_board
     board.add_checker(game_board, :red, 2, 0)
