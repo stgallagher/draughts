@@ -227,4 +227,24 @@ describe'BoardSurvey' do
                                                                  2, 4, 4, 6, 2, 4, 4, 2,
                                                                  2, 6, 4, 4] 
   end
+  
+  it "should generate only jump moves for the computer if they exist" do
+    board = Board.new
+    game_board = board.create_test_board
+    board.add_checker(game_board, :red, 2, 0)
+    board.add_checker(game_board, :red, 2, 2)
+    board.add_checker(game_board, :red, 2, 4)
+    board.add_checker(game_board, :red, 2, 6)
+    board.add_checker(game_board, :black, 3, 5)
+    @bs.generate_computer_moves(game_board, :red).should == [2, 4, 4, 6, 2, 6, 4, 4]
+  end
+  
+  it "should generate all possible moves for a normal board" do
+    board = Board.new
+    game_board = board.create_board
+    @bs.generate_all_possible_moves(game_board, :red).should == [2, 0, 3, 1, 2, 2, 3, 3,
+                                                                 2, 2, 3, 1, 2, 4, 3, 5,
+                                                                 2, 4, 3, 3, 2, 6, 3, 7,
+                                                                 2, 6, 3, 5] 
+  end
 end

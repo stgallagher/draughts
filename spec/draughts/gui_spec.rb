@@ -7,6 +7,7 @@ describe Gui do
     @gui = Gui.new
     @b = Board.new
     @board = @b.create_board
+    @clear_board = @b.create_test_board
   end 
   
   it "should print out an simple text display of the board" do
@@ -55,5 +56,10 @@ describe Gui do
                                                  "  7   |  #  |  RK |  #  |  B  |  #  |  B  |  #  |  B  |  \n" +
                                                  "      -------------------------------------------------\n\n"
     
+  end
+
+  it "should display a game ending message" do 
+    @b.add_checker(@clear_board, :red, 0, 0)
+    @gui.display_game_ending_message(@clear_board).should == "\n\nCongratulations, Red, You have won!!!"
   end
 end

@@ -12,10 +12,12 @@ class Minimax
     
     def best_move(board, player, depth)
       move_scores = []
-      moves_list = @bs.generate_all_possible_moves(board, player)
+      moves_list = @bs.generate_computer_moves(board, player)
+      #p "IN BEST MOVE : moves_list -> #{moves_list}"
       moves_list.each_slice(4) do |move|
         apply_move(board, move)
-        move_scores << minimax(board, 4)
+        move_scores << minimax(board, player, depth)
+        unapply_move(board, move)
       end
       move_scores.flatten
       best_score_index = move_scores.index(move_scores.max)
@@ -23,48 +25,31 @@ class Minimax
     end
     
     def minimax(board, player, depth)
-      # if game is over, return score of INFINITY based on victor
       if game_over?(board)
         return who_won(board)
       end
 
-      # if end of search return score
       if depth == 0
-        p "in depth == 0"
+        #p "in depth == 0"
         return @eval.evaluate_board(board, player)
-        p "in depth == 0: score = #{score}"
+        #p "in depth == 0: score = #{score}"
       else
-        # initial best scores
         player == :red ? best_score = -INFINITY : best_score = INFINITY
         
         moves_list = @bs.generate_all_possible_moves(board, player)
-        p "moves list = #{moves_list}"
-        # if no moves left, return score
+        #p "IN MINIMAX -> moves list = #{moves_list}"
         if moves_list == nil
           score = @eval.evaluate_board(board, player)
         else
-          # iterate through each move
           moves_list.each_slice(4) do |move| 
-            # do the move
             apply_move(board, move)
-            p board
-            # get the score
-            p "In iteration(before recurse): score = #{score}"
-            p "In iteration(before recurse): move = #{score}"
             score = minimax(board, player, depth-1)
-            # red player maximizes
-            p "In iteration(after recurse): score = #{score}"
-            p "In iteration(after_recurse): move = #{score}"
+            best_score = score > best_score ? score : best_score
             unapply_move(board, move) 
-            if player == :red and best_score < score
-              best_score = score
-            #black player minimizes
-            elsif player == :black and best_score > score
-              best_score = score
-            end
           end
         end
       end
+      #p best_score
       return best_score
     end
 
@@ -97,6 +82,7 @@ class Minimax
     end
 
     def apply_move(board, move)
+      #p "IN APPLY MOVE: move -> #{move}"
       checker = board[move[0]][move[1]]
       board[move[2]][move[3]] = checker
       board[move[0]][move[1]] = nil
@@ -105,10 +91,15 @@ class Minimax
     end
     
     def unapply_move(board, move)
+      #p "IN UNAPPLY MOVE: move -> #{move}"
       checker = board[move[2]][move[3]]
       board[move[0]][move[1]] = checker
       board[move[2]][move[3]] = nil
       checker.x_pos = move[0]
       checker.y_pos = move[1]
+    end
+
+    def other_player(player)
+      player == :red ? :black : :red
     end
 end

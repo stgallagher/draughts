@@ -71,18 +71,31 @@ class BoardSurvey
   
   def delta_translator(current_player, quad, x, y, mag)
     deltas = []
-    case quad
-    when "upper_left"
-      x += mag; y += mag
-    when "upper_right"
-      x += mag; y -= mag
-    when "lower_left"
-      x -= mag; y += mag
-    when "lower_right"
-      x -= mag; y -= mag  
+    if current_player == :red
+      case quad
+      when "upper_left"
+        x += mag; y += mag
+      when "upper_right"
+        x += mag; y -= mag
+      when "lower_left"
+        x -= mag; y += mag
+      when "lower_right"
+        x -= mag; y -= mag  
+      end
+    else
+      case quad
+      when "upper_left"
+        x -= mag; y -= mag
+      when "upper_right"
+        x -= mag; y += mag
+      when "lower_left"
+        x += mag; y -= mag
+      when "lower_right"
+        x += mag; y += mag  
+      end
     end
     deltas << x << y
-    current_player == :black ? deltas.reverse : deltas
+    deltas
   end
   
   def adjust_jump_locations_if_not_king(board, x, y, jump_locations)
@@ -94,6 +107,7 @@ class BoardSurvey
   end
 
   def jump_locations(board, current_player, x, y, opposing_checkers)
+
     jump_locations = {}
     opposing_checkers.each_pair do |quad, present|
       if present
@@ -220,6 +234,14 @@ class BoardSurvey
   def generate_all_possible_moves(board, current_player)
     all_moves = generate_normal_move_locations_list(board, current_player)
     all_moves << generate_computer_jump_locations_list(board, current_player)
+    all_moves.flatten
+  end
+
+  def generate_computer_moves(board, current_player)
+    all_moves = generate_computer_jump_locations_list(board, current_player)
+    if all_moves.size == 0
+      all_moves << generate_normal_move_locations_list(board, current_player)
+    end
     all_moves.flatten
   end
 end

@@ -11,6 +11,13 @@ class Game
     @game_board = @board.create_board
     @minmax = Minimax.new
   end
+  
+  def play_test_game
+    @game_board = @board.create_test_board
+    @board.add_checker(@game_board, :red, 0, 0)
+    @board.add_checker(@game_board, :black, 7, 7)
+    play_game
+  end
 
   def play_game
     @gui.intro
@@ -23,8 +30,8 @@ class Game
       message = nil
       puts @gui.render_board(@game_board)
       if single_player_game and @current_player == :red
-        move = @minmax.minimax(@game_board, :red, 4)
-        coordinates = move.slice(1, 4)
+        move = @minmax.best_move(@game_board, :red, 3)
+        coordinates = move
         message = @move_check.move_validator(self, @game_board, :red,  coordinates[0], coordinates[1], coordinates[2], coordinates[3])
       else
         @gui.move_request(@current_player)
@@ -35,7 +42,8 @@ class Game
       end
       puts message unless (message.nil? or message == "jumping move")
     end
-    @gui.display_game_ending_message  
+    puts @gui.render_board(@game_board)
+    puts @gui.display_game_ending_message(@game_board) 
   end
   
   def move(board, x_origin, y_origin, x_destination, y_destination)

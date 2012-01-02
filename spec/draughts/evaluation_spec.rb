@@ -8,10 +8,6 @@ describe Evaluation do
     @full_board = @b.create_board
     @clear_board = @b.create_test_board
   end
-
-  it "should have a weighted representation of the board" do
-    pending
-  end
   
   it "should calculate the value of a checker based on its position" do
     @b.add_checker(@clear_board, :red, 2, 0)

@@ -80,7 +80,38 @@ describe MoveCheck do
     @clear_board[3][3].make_king
     @mv.non_king_moving_backwards?(@clear_board, :red, 3, 3, 2).should == false
   end
+  
+  it "should not inidicate a jump over an empty space if the space is not empty" do
+    @b.add_checker(@clear_board, :red, 3, 5)
+    @b.add_checker(@clear_board, :black, 4, 4)
+    @mv.move_validator(@game, @clear_board, :black, 4, 4, 2, 6).should == "jumping move"
+  end
 
+  it "should insist that a jump be made if it is available" do
+    @b.add_checker(@clear_board, :red, 2, 0)
+    @b.add_checker(@clear_board, :red, 2, 6)
+    @b.add_checker(@clear_board, :black, 3, 1)
+    @mv.move_validator(@game, @clear_board, :red, 2, 6, 3, 5).should == "You must jump if a jump is available"
+    @mv.move_validator(@game, @clear_board, :red, 2, 0, 4, 2).should == "jumping move"
+  end
+  
+  it "should allow any jump that is available 1" do
+    @b.add_checker(@clear_board, :red, 2, 0)
+    @b.add_checker(@clear_board, :red, 2, 6)
+    @b.add_checker(@clear_board, :black, 3, 1)
+    @b.add_checker(@clear_board, :black, 3, 5)
+    @mv.move_validator(@game, @clear_board, :red, 2, 6, 4, 4).should == "jumping move"
+    @game.current_player.should == :black
+  end
+  
+  it "should allow any jump that is available 2" do
+    @b.add_checker(@clear_board, :red, 2, 0)
+    @b.add_checker(@clear_board, :red, 2, 6)
+    @b.add_checker(@clear_board, :black, 3, 1)
+    @b.add_checker(@clear_board, :black, 3, 5)
+    @mv.move_validator(@game, @clear_board, :red, 2, 0, 4, 2).should == "jumping move"
+    @game.current_player.should == :black
+  end 
   it "should not allow a player to jump with a different checker one they have started a jump move with a checker" do
     @b.add_checker(@clear_board, :red, 2, 0)
     @b.add_checker(@clear_board, :red, 2, 6)
@@ -89,6 +120,26 @@ describe MoveCheck do
     @b.add_checker(@clear_board, :black, 3, 5)
     @mv.move_validator(@game, @clear_board, :red, 2, 0, 4, 2).should == "jumping move"
     @mv.move_validator(@game, @clear_board, :red, 2, 6, 4, 4).should == "You cannot jump with a different checker"
+  end
+  
+  it "should switch player once a multi-jump is complete" do
+    @b.add_checker(@clear_board, :red, 2, 0)
+    @b.add_checker(@clear_board, :red, 2, 6)
+    @b.add_checker(@clear_board, :black, 3, 1)
+    @b.add_checker(@clear_board, :black, 5, 3)
+    @b.add_checker(@clear_board, :black, 3, 5)
+    @mv.move_validator(@game, @clear_board, :red, 2, 0, 4, 2).should == "jumping move"
+    @mv.move_validator(@game, @clear_board, :red, 2, 6, 4, 4).should == "You cannot jump with a different checker"
+    @game.current_player.should == :red
+    @mv.move_validator(@game, @clear_board, :red, 4, 2, 6, 4)
+    @game.current_player.should == :black
+  end
+  
+  it "should not indicate a jump available when a checker is adjacent to a perimeter checker" do
+    @b.add_checker(@clear_board, :red, 0, 0)
+    @b.add_checker(@clear_board, :black, 1, 1)
+    @game.current_player = :black
+    @mv.jump_available?(@clear_board, :black).should == false
   end
 
   it "should switch player control when a valid move is made" do

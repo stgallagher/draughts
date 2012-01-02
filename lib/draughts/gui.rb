@@ -1,5 +1,9 @@
 class Gui
   
+  def initialize
+    @board = Board.new
+  end
+
   def intro
     puts 'Welcome to Checkers!'
   end
@@ -46,8 +50,9 @@ class Gui
     board_display.join
   end
   
-  def display_game_ending_message
-    winner = (red_checkers_left == 0) ? :black : :red
-    puts "\n\nCongratulations, #{winner}, You have won!!!"
+  def display_game_ending_message(board)
+    winner = @board.checkers_left(board, :black) == 0 ? :red : :black
+    winner = winner.to_s.capitalize
+    return "\n\nCongratulations, #{winner}, You have won!!!"
   end
 end

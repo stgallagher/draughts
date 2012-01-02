@@ -60,7 +60,7 @@ class MoveCheck
       Board.king_checkers_if_necessary(board)
     end
     
-    if message == nil or (message == "jumping move" and jump_available?(board, current_player) == false)
+    if message == nil or (message == "jumping move" and @survey.any_jumps_left?(board, current_player, x_destination, y_destination)== false)
        if @consecutive_jumps == false
        game.current_player = game.switch_player
        end
@@ -90,7 +90,6 @@ class MoveCheck
     deltas = []
     x_dest > x_orig ? deltas << 1 : deltas << -1
     y_dest > y_orig ? deltas << 1 : deltas << -1
-    current_player == :red ? deltas : deltas.reverse
   end
 
   def attempted_jump_of_empty_space?(board, current_player, x_origin, y_origin, x_destination, y_destination)
