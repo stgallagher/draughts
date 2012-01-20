@@ -25,6 +25,6 @@ describe Game do
 
   it "should switch player" do
     @game.current_player = :red
-    @game.switch_player.should == :black
+    Game.switch_player(@game.current_player).should == :black
   end
 end

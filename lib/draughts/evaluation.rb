@@ -9,31 +9,52 @@ class Evaluation
                    [   4, nil,   3, nil,   3, nil,   3, nil],
                    [ nil,   4, nil,   4, nil,   4, nil,   4], ]
 
-  def evaluate_board(board, color)
+  def evaluate_board(board)
     player_value = 0
     opponent_value = 0
 
-    color == :red ? opponent_color = :black : opponent_color = :red
+    #color == :red ? opponent_color = :black : opponent_color = :red
 
     board.each do |row|
       row.each do |position|
         if position.nil? == false
-          position.color == color ? player_value += calculate_value(position, color) : opponent_value += calculate_value(position, opponent_color)
+          position.color == :red  ? player_value += calculate_value(position, :red) : opponent_value += calculate_value(position, :black)
         end
       end
     end
+    #p "player value - opponent_value = #{player_value}  - #{opponent_value}"
     return player_value - opponent_value
+  end
+
+  def evaluate_board2(board)
+    red_count= 0
+    black_count = 0
+
+    board.each do |row|
+      row.each do |position|
+        if position.nil? == false
+          position.color == :red  ? red_count += 1 : black_count += 1
+        end
+      end
+    end
+    #p "player value - opponent_value = #{player_value}  - #{opponent_value}"
+    #p "IN EVALUATE 2: net count = > #{red_count - black_count}"
+    return red_count - black_count
   end
 
   def calculate_value(position, color)
     if color == :red
-      if position.x_pos == 5 or position.x_pos == 6
+      if position.x_pos == 7
+        value = 10
+      elsif position.x_pos == 5 or position.x_pos == 6
         value = 7
       else
         value = 5
       end
     elsif color == :black
-      if position.x_pos == 1 or position.x_pos == 2
+      if position.x_pos == 0
+        value = 10
+      elsif position.x_pos == 1 or position.x_pos == 2
         value = 7
       else
         value = 5
@@ -43,7 +64,7 @@ class Evaluation
     if position.is_king?
       value = 10
     end
-    
+    #p "IN CALCULATE VALUE : positon, color, value = (#{position.x_pos}, #{position.y_pos}) , #{color} , #{value}"
     return value * BOARD_WEIGHT[position.x_pos][position.y_pos]
   end
 end

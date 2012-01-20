@@ -2,16 +2,16 @@ require 'spec_helper'
 
 
 describe Gui do
-  
+
   before(:each) do
     @gui = Gui.new
     @b = Board.new
     @board = @b.create_board
     @clear_board = @b.create_test_board
-  end 
-  
+  end
+
   it "should print out an simple text display of the board" do
-        @gui.render_board(@board).should == "\n         0     1     2     3     4     5     6    7    \n\n" +    
+        Gui.render_board(@board).should == "\n         0     1     2     3     4     5     6    7    \n\n" +
                                                  "      -------------------------------------------------\n" +
                                                  "  0   |  R  |  #  |  R  |  #  |  R  |  #  |  R  |  #  |  \n" +
                                                  "      -------------------------------------------------\n" +
@@ -29,7 +29,7 @@ describe Gui do
                                                  "      -------------------------------------------------\n" +
                                                  "  7   |  #  |  B  |  #  |  B  |  #  |  B  |  #  |  B  |  \n" +
                                                  "      -------------------------------------------------\n\n"
-    
+
   end
 
   it "should print a BK or RK for black king checkers or red king checkers" do
@@ -37,7 +37,7 @@ describe Gui do
        @board[0][0].color = :black
        @board[7][1].make_king
        @board[7][1].color = :red
-       @gui.render_board(@board).should == "\n         0     1     2     3     4     5     6    7    \n\n" +    
+       Gui.render_board(@board).should == "\n         0     1     2     3     4     5     6    7    \n\n" +
                                                  "      -------------------------------------------------\n" +
                                                  "  0   |  BK |  #  |  R  |  #  |  R  |  #  |  R  |  #  |  \n" +
                                                  "      -------------------------------------------------\n" +
@@ -55,10 +55,10 @@ describe Gui do
                                                  "      -------------------------------------------------\n" +
                                                  "  7   |  #  |  RK |  #  |  B  |  #  |  B  |  #  |  B  |  \n" +
                                                  "      -------------------------------------------------\n\n"
-    
+
   end
 
-  it "should display a game ending message" do 
+  it "should display a game ending message" do
     @b.add_checker(@clear_board, :red, 0, 0)
     @gui.display_game_ending_message(@clear_board).should == "\n\nCongratulations, Red, You have won!!!"
   end

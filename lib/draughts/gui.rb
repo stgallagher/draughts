@@ -1,5 +1,5 @@
 class Gui
-  
+
   def initialize
     @board = Board.new
   end
@@ -7,20 +7,20 @@ class Gui
   def intro
     puts 'Welcome to Checkers!'
   end
-  
+
   def one_or_two_player_prompt
     print "Do you want to play against the computer? (y or n)"
   end
 
   def move_request(current_player)
     print "#{current_player.to_s.upcase} make move(x1, y1, x2, y2): "
-  end 
-  
-  def render_board(board)
+  end
+
+  def self.render_board(board)
     board_display = []
     board_display << "\n         0     1     2     3     4     5     6    7    \n"
     board_display << "\n      -------------------------------------------------\n"
-    
+
     0.upto(7) do |x_coord|
       board_display << "  #{x_coord}   |  "
       0.upto(7) do |y_coord|
@@ -49,7 +49,7 @@ class Gui
     board_display << "\n"
     board_display.join
   end
-  
+
   def display_game_ending_message(board)
     winner = @board.checkers_left(board, :black) == 0 ? :red : :black
     winner = winner.to_s.capitalize

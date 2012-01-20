@@ -1,24 +1,24 @@
 class Board
-  
+
   def create_board
     board = Array.new(8)
     8.times { |index| board[index] = Array.new(8) }
     populate_checkers(board)
     board
   end
-  
+
   def create_test_board
     board = Array.new(8)
     8.times { |index| board[index] = Array.new(8) }
     board
   end
-  
+
   def add_checker(board, color, x, y)
     board[x][y] = Checker.new(x, y, color)
   end
 
   def place_checker_on_board(board, checker)
-    board[checker.x_pos][checker.y_pos] = checker 
+    board[checker.x_pos][checker.y_pos] = checker
   end
 
   def populate_checkers(board)
@@ -46,8 +46,8 @@ class Board
     elsif x_coord.odd?
       odds.each(&apply_checker)
     end
-  end  
-  
+  end
+
   def checkers_left(board, color)
     checker_count = 0
 
@@ -60,7 +60,7 @@ class Board
     end
     checker_count
   end
-  
+
   def self.king_checkers_if_necessary(board)
     board.each do |row|
       row.each do |loc|
@@ -76,10 +76,22 @@ class Board
   def self.remove_jumped_checker(board, x_origin, y_origin, x_destination, y_destination)
     x_delta = (x_destination > x_origin) ? 1 : -1
     y_delta = (y_destination > y_origin) ? 1 : -1
-    
+
     board[x_origin + x_delta][y_origin + y_delta] = nil
+    board
   end
-  
+
+  def self.return_jumped_checker(board, x_origin, y_origin, x_destination, y_destination)
+    jumping_checker_color = board[x_destination][y_destination].color
+    returning_checker_color = jumping_checker_color == :red ? :black : :red
+
+    x_delta = (x_destination > x_origin) ? 1 : -1
+    y_delta = (y_destination > y_origin) ? 1 : -1
+
+    board[x_origin + x_delta][y_origin + y_delta] = Checker.new(x_origin + x_delta, y_origin + y_delta, returning_checker_color)
+    board
+  end
+
   def remove_checker(board, x, y)
     board[x][y] = nil
   end
