@@ -12,7 +12,11 @@ class MoveCheck
 
     case
     when (@consecutive_jumps and board[x_origin][y_origin] != @consecutive_jumper)
-        message =  "You cannot jump with a different checker"
+      message =  "You cannot jump with a different checker"
+
+    when trying_to_move_to_a_void_square(x_destination, y_destination)
+      message = "You cannot move to a void square"
+
     when out_of_bounds?(x_destination, y_destination)
       message = "You cannot move off the board"
 
@@ -22,11 +26,11 @@ class MoveCheck
     when trying_to_move_opponents_checker?(board,current_player, x_origin, y_origin)
       message = "You cannot move an opponents checker"
 
-    when trying_to_move_more_than_one_space_and_not_jumping?(x_origin, x_destination)
-      message = "You cannot move more than one space if not jumping"
-
     when attempted_non_diagonal_move?(x_origin, y_origin, x_destination, y_destination)
       message = "You can only move a checker diagonally"
+
+    when trying_to_move_more_than_one_space_and_not_jumping?(x_origin, y_origin, x_destination, y_destination)
+      message = "You cannot move more than one space if not jumping"
 
     when attempted_move_to_occupied_square?(board, x_destination, y_destination)
       message = "You cannot move to an occupied square"
@@ -54,7 +58,6 @@ class MoveCheck
         if @survey.any_jumps_left?(board, current_player, x_destination, y_destination)
           @consecutive_jumps = true
           @consecutive_jumper = board[x_destination][y_destination]
-          p "IN MOVE VALIDATOR => consecutive jumper = #{@consecutive_jumper}"
         end
       end
       Board.king_checkers_if_necessary(board)
@@ -90,6 +93,19 @@ class MoveCheck
     deltas = []
     x_dest > x_orig ? deltas << 1 : deltas << -1
     y_dest > y_orig ? deltas << 1 : deltas << -1
+  end
+
+  def trying_to_move_to_a_void_square(x_destination, y_destination)
+    (0..7).each do |row|
+      (0..7).each do |col|
+        if row % 2 == 0 and col % 2 == 1
+          return true if x_destination == row and y_destination == col
+        elsif row % 2 == 1 and col % 2 == 0
+          return true if x_destination == row and y_destination == col
+        end
+      end
+    end
+    return false
   end
 
   def attempted_jump_of_empty_space?(board, current_player, x_origin, y_origin, x_destination, y_destination)
@@ -138,12 +154,12 @@ class MoveCheck
     current_player != board[x_origin][y_origin].color
   end
 
-  def trying_to_move_more_than_one_space_and_not_jumping?(x_origin, x_destination)
-    (x_destination - x_origin).abs > 2
+  def trying_to_move_more_than_one_space_and_not_jumping?(x_origin, y_origin, x_destination, y_destination)
+    (x_destination - x_origin).abs > 2 or (y_destination - y_origin).abs > 2
   end
 
   def attempted_non_diagonal_move?(x_origin, y_origin, x_destination, y_destination)
-    (x_origin == x_destination) or (y_origin == y_destination)
+    (x_origin == x_destination) or (y_origin == y_destination) or (x_destination - x_origin).abs != (y_destination - y_origin).abs
   end
 
   def attempted_move_to_occupied_square?(board, x_destination, y_destination)

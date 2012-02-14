@@ -1,5 +1,9 @@
 class Evaluation
 
+  def initialize
+    @mc = MoveCheck.new
+  end
+
   BOARD_WEIGHT = [ [   4, nil,   4, nil,   4, nil,   4, nil],
                    [ nil,   3, nil,   3, nil,   3, nil,   4],
                    [   4, nil,   2, nil,   2, nil,   3, nil],
@@ -9,7 +13,17 @@ class Evaluation
                    [   4, nil,   3, nil,   3, nil,   3, nil],
                    [ nil,   4, nil,   4, nil,   4, nil,   4], ]
 
-  def evaluate_board(board)
+  def evaluation_chooser(choice, board)
+    if choice == 1
+      evaluate_board1(board)
+    elsif choice == 2
+      evaluate_board2(board)
+    elsif choice == 3
+      evaluate_board3(board)
+    end
+  end
+
+  def evaluate_board1(board)
     player_value = 0
     opponent_value = 0
 
@@ -23,6 +37,10 @@ class Evaluation
       end
     end
     #p "player value - opponent_value = #{player_value}  - #{opponent_value}"
+    if @mc.jump_available?(board, :black)
+      opponent_value += 50
+    end
+
     return player_value - opponent_value
   end
 
@@ -40,6 +58,10 @@ class Evaluation
     #p "player value - opponent_value = #{player_value}  - #{opponent_value}"
     #p "IN EVALUATE 2: net count = > #{red_count - black_count}"
     return red_count - black_count
+  end
+
+  def evaluate_board3(board)
+    return 0
   end
 
   def calculate_value(position, color)

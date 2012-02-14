@@ -35,7 +35,11 @@ class BoardSurvey
   end
 
   def assign_adjacent_board_coords(current_player, x, y)
-    jump_positions = Hash[QUADRANTS.zip(deltas_to_board_locations(normal_deltas(current_player), x, y).each_slice(2))]
+    d = normal_deltas(current_player)
+    b = deltas_to_board_locations(d, x, y)
+    c = b.each_slice(2).to_a
+    a = QUADRANTS.zip(c)
+    jump_positions = Hash[a]
     if edge?(x)
       return edge_adjust(x, current_player, jump_positions)
     end

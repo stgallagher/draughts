@@ -2,21 +2,25 @@ class Gui
 
   def initialize
     @board = Board.new
+    @input = UserInput.new
   end
 
   def intro
     puts 'Welcome to Checkers!'
   end
 
-  def one_or_two_player_prompt
-    print "Do you want to play against the computer? (y or n)"
+  def one_or_two_player
+    print "Do you want a one-player or two-player game (1 or 2) : "
+    response = gets
   end
 
-  def move_request(current_player)
+  def get_move_coordinates(current_player)
     print "#{current_player.to_s.upcase} make move(x1, y1, x2, y2): "
+    player_input = gets
+    coordinates = @input.translate_move_request_to_coordinates(player_input)
   end
 
-  def self.render_board(board)
+  def render_board(board)
     board_display = []
     board_display << "\n         0     1     2     3     4     5     6    7    \n"
     board_display << "\n      -------------------------------------------------\n"
@@ -48,6 +52,7 @@ class Gui
     end
     board_display << "\n"
     board_display.join
+    board_display.each { |line| print line}
   end
 
   def display_game_ending_message(board)

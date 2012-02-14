@@ -11,14 +11,14 @@ class Minimax
       @jumped_checker = []
     end
 
-    def best_move(board, player, depth)
+    def best_move(board, player, depth, eval_choice)
       #p "IN BEST MOVE : player -> #{player}"
       move_scores = []
       moves_list = @bs.generate_computer_moves(board, player)
       moves_list.each_slice(4) do |move|
       #p "IN BEST MOVE : before apply move"
         apply_move(board, move)
-        move_scores << minimax(board, :black, depth)
+        move_scores << minimax(board, :black, depth, eval_choice)
       #p "IN BEST MOVE : before unapply move"
         unapply_move(board, move)
       end
@@ -28,32 +28,92 @@ class Minimax
       best_score_index = move_scores.index(move_scores.max)
       #p "IN BEST MOVE : best_score_index -> #{best_score_index}"
       best_move_coords = moves_list.slice(best_score_index * 4, 4)
-      p "IN BEST MOVE : best_move_coords -> #{best_move_coords}"
+      #p "IN BEST MOVE : best_move_coords -> #{best_move_coords}"
       best_move_coords
     end
 
-    def minimax(board, player, depth)
+    def best_move_negamax(board, player, depth, eval_choice)
+      moves_list = @bs.generate_computer_moves(board, player)
+      #p "IN BEST_MOVE_NEGAMAX - moves_list = #{moves_list}"
+      max = -INFINITY
+      best_move = []
+      moves_list.each_slice(4) do |move|
+        apply_move(board, move)
+        score = -negamax(board, Game.switch_player(player), depth - 1, eval_choice)
+        #p "IN BEST_MOVE_NEGAMAX - score = #{score} with move #{move}"
+        if score > max
+          max = score
+          best_move = move
+        end
+        unapply_move(board, move)
+      end
+      #p "IN BEST_MOVE_NEGAMAX - best_move = #{best_move}"
+      return best_move
+    end
+
+    def negamax(board, player, depth, eval_choice)
+      #game over evaluation
+      if game_over?(board)
+        return_score = who_won(board)
+        #p "IN NEGAMAX - RETURNED SCORE(game_over) = #{return_score} for player #{player}"
+        return return_score
+      end
+
+      #leaf evaluation
+      if depth == 0
+        evaluated_score = @eval.evaluation_chooser(eval_choice, board)
+        return_score = player == :red ? evaluated_score : -evaluated_score
+        #p "IN NEGAMAX - RETURNED SCORE(leaf) = #{return_score} for player #{player}"
+        return return_score
+      end
+
+      max = -INFINITY
+      moves_list = @bs.generate_computer_moves(board, player)
+
+      #no possible move evaluation
+      if moves_list == []
+        return_score = player == :red ? -INFINITY : INFINITY
+        #p "IN NEGAMAX - RETURNED SCORE(empty moves_list) = #{return_score} for player #{player}"
+        return return_score
+      end
+
+      #p "IN NEGAMAX - moves_list = #{moves_list}"
+      #scoring each move
+      moves_list.each_slice(4) do |move|
+        apply_move(board, move)
+        score = -negamax(board, Game.switch_player(player), depth-1, eval_choice)
+        if score > max
+          max = score
+        end
+        unapply_move(board, move)
+      end
+
+      #returning max
+      return max
+    end
+
+    def minimax(board, player, depth, eval_choice)
       #p "IN MINIMAX: player -> #{player}"
       if game_over?(board)
         return who_won(board)
       end
 
       if depth == 0
-        evaluated_score = @eval.evaluate_board(board)
+        evaluated_score = @eval.evaluation_chooser(eval_choice, board)
         #p "IN MINIMAX -> returned value = #{evaluated_score}"
-        return @eval.evaluate_board(board)
+        return @eval.evaluation_chooser(eval_choice, board)
       else
         player == :red ? best_score = -INFINITY : best_score = INFINITY
 
         moves_list = @bs.generate_all_possible_moves(board, player)
         #p "IN MINIMAX -> moves list = #{moves_list}"
         if moves_list == nil
-          score = @eval.evaluate_board(board)
+          score = @eval.evaluation_chooser(eval_choice, board)
         else
           moves_list.each_slice(4) do |move|
             #p "IN MINIMAX -> before apply move"
             apply_move(board, move)
-            score = minimax(board, Game.switch_player(player), depth-1)
+            score = minimax(board, Game.switch_player(player), depth-1, eval_choice)
             if player == :red
               #p "IN MINIMAX -> in best score branch(red) -> #{best_score}"
               best_score = score > best_score ? score : best_score

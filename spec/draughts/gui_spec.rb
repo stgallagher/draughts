@@ -11,7 +11,7 @@ describe Gui do
   end
 
   it "should print out an simple text display of the board" do
-        Gui.render_board(@board).should == "\n         0     1     2     3     4     5     6    7    \n\n" +
+        @gui.render_board(@board).to_s.should == "\n         0     1     2     3     4     5     6    7    \n\n" +
                                                  "      -------------------------------------------------\n" +
                                                  "  0   |  R  |  #  |  R  |  #  |  R  |  #  |  R  |  #  |  \n" +
                                                  "      -------------------------------------------------\n" +
@@ -37,7 +37,7 @@ describe Gui do
        @board[0][0].color = :black
        @board[7][1].make_king
        @board[7][1].color = :red
-       Gui.render_board(@board).should == "\n         0     1     2     3     4     5     6    7    \n\n" +
+       @gui.render_board(@board).to_s.should == "\n         0     1     2     3     4     5     6    7    \n\n" +
                                                  "      -------------------------------------------------\n" +
                                                  "  0   |  BK |  #  |  R  |  #  |  R  |  #  |  R  |  #  |  \n" +
                                                  "      -------------------------------------------------\n" +
